@@ -1,0 +1,204 @@
+=head1 NAME
+
+Chart::Pie - a pie charting module 
+
+=head1 SYNOPSIS
+
+    use Chart::Pie;
+
+    $obj = Chart::Pie->new;
+    $obj = Chart::Pie->new ( $gif_width, $gif_height );
+   
+    $obj->set ( $key_1, $val_1, ... ,$key_n, $val_n );
+    $obj->set ( $key_1 => $val_1,
+           ...
+           $key_n => $val_n );
+    $obj->set ( %hash );
+
+    # GIFgraph.pm-style API
+    @data = ( \@x_tick_labels, \@dataset1, ... , \@dataset_n );
+    $obj->gif ( "filename", \@data );
+    $obj->gif ( $filehandle, \@data );
+    $obj->gif ( FILEHANDLE, \@data );
+    $obj->cgi_gif ( \@data );
+
+    # Graph.pm-style API
+    $obj->add_pt ($label, $val_1, ... , $val_n);
+    $obj->add_dataset ($val_1, ... , $val_n);
+    $obj->gif ( "filename" );
+    $obj->gif ( $filehandle );
+    $obj->gif ( FILEHANDLE );
+    $obj->cgi_gif ();
+
+=head1 DESCRIPTION
+
+This module builds upon David Bonner's Chart v0.99 module, and provides
+a Pie charting ability.  The original Chart module already provides
+lines, bars, stackedbars, etc.  Even most of this POD was scalped from
+his Chart.pod document.
+
+I tried to make the API for this module as similar to the other Chart
+modules as possible, reusing as many of it's functions as I could, and
+only adding options and optional values as necessary.  I really like
+David Bonner's Chart module, and using his code as a template, came up
+with the Pie module in about a day.
+
+Like GIFgraph, Chart uses Lincoln Stein's GD module for all of its
+graphics primitives calls, which means the Pie module does, also.
+
+=head2 use-ing Chart::Pie
+
+There's really no Chart::Pie module, but like the other chart
+types provided, it is really just a new class inheriting from
+the Chart::Base class.
+
+For example,
+  
+  use Chart::Pie;
+
+would invoke the Pie module.
+
+=head2 Getting an object
+
+The new method can either be called without arguments, in which case
+it returns an object with the default image size (400x300 pixels), or
+you can specify the width and height of the image.  For example,
+
+  $obj = Chart::Pie (600,400);
+
+would return a Chart::Pie object containing a 600x400 pixel image.
+New also initializes most of the default variables, which you can
+subsequently change with the set method.
+
+=head2 Setting different options
+
+Almost all of the different set options are available from the
+main Chart module. Please refer to Chart.pod for a description of
+those. I will describe here the options and new values pertaining
+only to the Pie module.
+
+The following are all of the currently supported options:
+
+=over 4
+
+=item 'legend_labels'
+
+Sets the values for the labels for the different datasets.  Should
+be assigned a reference to an array of labels.  For example,
+  
+  @labels = ('foo', 'bar');
+  $obj->set ('legend_labels' => \@labels);
+
+Default is empty, in which case 'Dataset 1', 'Dataset 2', etc. are
+used as the labels.  
+
+For a pie graph, this option is NOT ignored. The values for the legend 
+labels are used as the labels for the pie slices. I'll explain later
+why I use the legend_labels rather than the dataset0, or x_tick_labels
+value for the pie slice labels.
+
+=item 'x_ticks'
+
+Default is 'normal'. But, a new valid value for Pie charts is 'none'.
+This will keep the ticks and tick labels along the x-axis from being
+drawn, as tick labels are not usually useful for pie charts.
+
+=item 'y_ticks'
+
+Default is 6. But, a new valid value for Pie charts is 'none'.
+This will keep the ticks and tick labels along the y-axis from being
+drawn, as tick labels are not usually useful for pie charts.
+
+=item 'imagemap'
+
+This option is currently unsupported by the Pie chart module.
+
+=item 'label_values'
+
+Default is undef. This is used to optionally display the numerical
+value or percentage value of each pie slice in a pie chart along with
+the label. Valid values are 'percent', 'value', or 'both'.
+
+=back 
+
+=head1 EXAMPLE 1 - Simple Pie Chart
+
+   use Chart::Pie;
+
+   my $chart = Chart::Pie->new(640,480);
+
+   $chart->set( 'title'   => 'A Day in the Life',
+                'x_label' => 'X Axis Label',
+                'y_label' => 'Y Axis Label' ,
+                'label_values' => 'percent', # tell me percentage of
+                                             # each day spent on
+                                             # each activity
+                'x_ticks'  => 'none',
+                'y_ticks'  => 'none',
+   );
+
+   $chart->add_dataset( qw(Junk_X_Tick_Label) );
+   $chart->add_dataset( qw(8) );
+   $chart->add_dataset( qw(8) );
+   $chart->add_dataset( qw(2) );
+   $chart->add_dataset( qw(6) );
+
+
+   $chart->set('legend_labels' => [ 'Sleep', 'Work', 'Eat', 'Watch TV' ]);
+   $chart->gif('output.gif');
+
+=head1 EXAMPLE 2 - Another Pie Chart
+
+This is an example as to why the pie slice labels come from 
+the legend labels, rather than the x tick values.
+
+   use Chart::Pie;
+
+   my $chart = Chart::Pie->new(640,480);
+
+   $chart->set( 'title'   => 'A Week in the Life',
+                'x_label' => 'X Axis Label',
+                'y_label' => 'Y Axis Label' ,
+                'label_values' => 'value', # tell me how many hours
+                                           # for each activity
+                'x_ticks'  => 'none',
+                'y_ticks'  => 'none',
+   );
+
+   # Now, you will see below the same data that could be
+   # passed to a Bars or StackedBars chart. I felt that
+   # a pie chart of this data was more meaningful
+   # if it told me how much time I spent working, eating,
+   # etc..., rather than that Monday was a 24 hour day,
+   # Tuesday was a 24 hour day, and Saturday was 22 hour
+   # day.  By using the legend (or dataset) labels for the
+   # pie slices, I get a more meaningful chart.
+   $chart->add_dataset( qw(Mon Tue Wed Thu Fri Sat Sun) );
+   $chart->add_dataset( qw(8   8   8   8   8   10  10 ) );
+   $chart->add_dataset( qw(8   8   9   8   7   0   0  ) );
+   $chart->add_dataset( qw(2   2   2   2   3   3   3  ) );
+   $chart->add_dataset( qw(6   6   5   6   6   9   9  ) );
+
+
+   $chart->set('legend_labels' => [qw(Sleep Work Eat WatchTV)]);
+   $chart->gif('output.gif');
+
+
+=head1 BUGS
+
+Probably quite a few, since this is my very first module.  As usual,
+please mail me with any bugs, patches, suggestions, comments, flames,
+death threats, etc.
+
+Since I never use the data captured in dataset0, I should probably
+make adding the first dataset optional. 
+
+=head1 AUTHOR
+
+Karlon West (karlon@netcom.com)
+
+=head1 COPYRIGHT
+
+Copyright(c) 1999 by Karlon West.  All rights reserved.  This program 
+is free software; you can redistribute it and/or modify it under the same 
+terms as Perl itself.

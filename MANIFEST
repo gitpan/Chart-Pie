@@ -1,0 +1,7 @@
+COPYING
+Pie.pm
+MANIFEST
+Makefile.PL
+README
+t/pie.t
+Pie.pod

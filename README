@@ -1,0 +1,58 @@
+-------------------------------------------------------------------------
+Chart::Pie version 0.90
+-------------------------------------------------------------------------
+
+   This is the first version (and my first CPAN module) of a general
+purpose, pie-graphing module.  It is really a subclass of David Bonner's
+Chart v0.99 module, which currently supports easy generation of line,
+bar, point, point-and-line, stacked bar, and composite charts.  This
+module adds the support for pie charts.  As with the Chart module, this
+module also make use of Lincoln Stein's GD module for graphics
+primitives.
+
+   This is just a beta. It's my first attempt at a perl Module. 
+Chart v0.99 is also in beta. So, use it at your own risk.
+
+----------
+INSTALLING
+----------
+
+The usual.
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+This should install to your site_perl directory.  The test script also
+put samples of a pie chart in the samples/ directory.
+
+
+-------------
+PREREQUISITES
+-------------
+
+David Bonner's Chart module, at least version 0.99
+
+Lincoln Stein's GD module
+
+-------
+CHANGES
+-------
+
+None, this is the first.
+
+------
+AUTHOR
+------
+
+Karlon West (karlon@netcom.com)
+
+---------
+COPYRIGHT
+---------
+
+Copyright(c) 1999 Karlon West.  All rights reserved.  This program 
+is free software; you can redistribute it and/or modify it under the 
+same terms as Perl itself.
+
